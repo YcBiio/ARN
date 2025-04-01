@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Animation ARNm et Protéines - Version Avancée</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    /* Conteneur principal pour l'animation */
+    #container {
+      position: relative;
+      width: 900px;
+      height: 400px;
+      margin: 20px auto;
+      background: #fff;
+      border: 1px solid #ccc;
+      overflow: hidden;
+    }
+
+    /* Boutons et contrôles */
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #speedSlider {
+      width: 100px;
+    }
+
+    /* Barre d'ARNm */
+    .mRNA {
+      position: absolute;
+      bottom: 50px;
+      left: 50px;
+      width: 800px;
+      height: 10px;
+      background-color: #0077cc;
+    }
+    
+    /* Représentation d’un codon */
+    .codon {
+      position: absolute;
+      bottom: 35px;
+      width: 45px;
+      height: 45px;
+      background-color: #ffcc00;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 45px;
+      font-weight: bold;
+      color: #333;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    
+    /* Surlignage du codon en cours de lecture */
+    .codon.active {
+      background-color: #ffd966;
+      box-shadow: 0 0 10px #ffd966;
+    }
+
+    /* Ribosome (boule verte) */
+    .ribosome {
+      position: absolute;
+      bottom: 20px;
+      width: 60px;
+      height: 60px;
+      background-color: #66cc66;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 60px;
+      font-weight: bold;
+      color: #fff;
+      font-size: 18px;
+    }
+    
+    /* Représentation d’un acide aminé dans la protéine */
+    .protein {
+      position: absolute;
+      top: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 40px;
+      font-weight: bold;
+      color: #fff;
+      font-size: 14px;
+      transform: translateX(-50%);
+    }
+    
+    /* Zone d'explications */
+    #explanations {
+      width: 900px;
+      margin: 20px auto;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 20px;
+    }
+    
+    #explanations h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <!-- Zone de contrôle -->
+  <div id="controls">
+    <button id="startButton">Démarrer</button>
+    <button id="pauseButton" disabled>Pause</button>
+    <label for="speedSlider">Vitesse:</label>
+    <input type="range" id="speedSlider" min="0.5" max="5" step="0.5" value="1" />
+  </div>
+  
+  <!-- ARNm et Ribosome -->
+  <div class="mRNA" id="mrna"></div>
+  <div class="ribosome" id="ribosome">R</div>
+  <div id="proteinChain"></div>
+</div>
+
+<div id="explanations">
+  <h2>L’ARN : plus qu’un simple messager</h2>
+  <p>
+    L’<strong>acide ribonucléique (ARN)</strong> est un acide nucléique essentiel à de nombreux
+    processus biologiques. Dans le cadre de la <strong>traduction</strong>, l’ARN messager (ARNm) 
+    porte l’information codée dans l’ADN vers le ribosome. Les <em>codons</em>, triplets de nucléotides, 
+    sont « lus » par le ribosome, et chaque codon correspond à un acide aminé ou à un signal 
+    (par exemple le codon « Stop »).
+  </p>
+  <p>
+    Cependant, l’ARN ne se limite pas à cette seule fonction de messager. On trouve d’autres types d’ARN, 
+    notamment :
+  </p>
+  <ul>
+    <li>
+      <strong>ARN de transfert (ARNt)</strong> : amène l’acide aminé spécifique correspondant à un codon 
+      donné vers le ribosome.
+    </li>
+    <li>
+      <strong>ARN ribosomique (ARNr)</strong> : constitue une grande partie de la structure des ribosomes 
+      et joue un rôle catalytique dans la formation de la liaison peptidique.
+    </li>
+    <li>
+      <strong>Micro-ARN (miARN)</strong> et <strong>ARN interférents (ARNi)</strong> : interviennent dans 
+      la régulation de l’expression des gènes, en empêchant ou en modulant la traduction de certains ARNm.
+    </li>
+    <li>
+      <strong>ARN non codants divers</strong> : impliqués dans la régulation, la modification post-transcriptionnelle 
+      (épissage) et d’autres processus.
+    </li>
+  </ul>
+  <p>
+    Ainsi, l’ARN joue un rôle fondamental et polyvalent dans la cellule, allant de la synthèse des protéines 
+    à la régulation de l’expression génétique. L’animation ci-dessus illustre la traduction 
+    d’un ARNm particulier, mais gardez à l’esprit que la biologie moléculaire est un domaine vaste 
+    et complexe où l’ARN intervient de multiples façons.
+  </p>
+  <p>
+    Pour plus d’informations, vous pouvez consulter l’article Wikipédia : 
+    <a href="https://fr.wikipedia.org/wiki/Acide_ribonucl%C3%A9ique" target="_blank">Acide ribonucléique</a>.
+  </p>
+</div>
+
+<script>
+  // --------------------------------------------------------------------------
+  // Dictionnaire simplifié : codon => { nom, couleur }
+  // Vous pouvez ajouter d'autres codons et couleurs pour enrichir l'exemple.
+  // --------------------------------------------------------------------------
+  const codonMap = {
+    "AUG": { name: "Met",  color: "#e74c3c" },  // Start
+    "UUC": { name: "Phe",  color: "#9b59b6" },
+    "GUG": { name: "Val",  color: "#2ecc71" },
+    "AAA": { name: "Lys",  color: "#3498db" },
+    "UAA": { name: "Stop", color: "#7f8c8d" },  // Stop
+    // Ajoutez plus de codons si vous le souhaitez
+  };
+
+  // Séquence de codons à traduire (exemple simplifié)
+  const codonSequence = ["AUG", "UUC", "GUG", "AAA", "UAA"];
+
+  const startButton = document.getElementById('startButton');
+  const pauseButton = document.getElementById('pauseButton');
+  const speedSlider = document.getElementById('speedSlider');
+  
+  const ribosome = document.getElementById('ribosome');
+  const mrna = document.getElementById('mrna');
+  const proteinChain = document.getElementById('proteinChain');
+
+  let codonSpacing = 70;    // Espace horizontal entre les codons
+  let ribosomeX = 0;        // Position du ribosome sur l'axe X
+  let currentCodonIndex = 0;
+  let animationId;
+  let isPaused = false;     // Pour la gestion de la pause
+  let speed = parseFloat(speedSlider.value); // Vitesse initiale
+
+  // Tableau pour stocker les éléments DOM "codon"
+  let codons = [];
+
+  // Création dynamique des codons sur l'ARN
+  function createCodons() {
+    // Supprime les éventuels anciens codons
+    codons.forEach(c => c.remove());
+    codons = [];
+
+    for (let i = 0; i < codonSequence.length; i++) {
+      let codonDiv = document.createElement('div');
+      codonDiv.classList.add('codon');
+      codonDiv.textContent = codonSequence[i];
+      codonDiv.style.left = (mrna.offsetLeft + i * codonSpacing) + 'px';
+      document.getElementById('container').appendChild(codonDiv);
+      codons.push(codonDiv);
+    }
+  }
+
+  // Fonction d'animation
+  function animate() {
+    if (isPaused) {
+      // Si en pause, on relance la boucle sans déplacer le ribosome
+      animationId = requestAnimationFrame(animate);
+      return;
+    }
+
+    // On avance le ribosome en fonction de la vitesse choisie
+    ribosomeX += 1 * speed;
+    ribosome.style.left = ribosomeX + 'px';
+
+    // Calcul de la position du codon en cours
+    if (currentCodonIndex < codons.length) {
+      const codonDiv = codons[currentCodonIndex];
+      const codonPos = parseFloat(codonDiv.style.left);
+
+      // Surligner le codon actuel, désactiver les autres
+      codons.forEach((c, index) => {
+        c.classList.toggle('active', index === currentCodonIndex);
+      });
+
+      // Quand le ribosome atteint un nouveau codon, on simule sa traduction
+      if (ribosomeX >= codonPos && currentCodonIndex < codonSequence.length) {
+        const codon = codonSequence[currentCodonIndex];
+        const aaInfo = codonMap[codon];
+
+        // Création de l'élément "acide aminé" seulement si ce n'est pas un codon STOP
+        if (aaInfo && aaInfo.name !== "Stop") {
+          let protein = document.createElement('div');
+          protein.classList.add('protein');
+          protein.textContent = aaInfo.name;
+          protein.style.backgroundColor = aaInfo.color;
+          // Positionner l'acide aminé sur la chaîne, au-dessus du codon
+          protein.style.left = (codonPos + 22) + 'px'; // +22 pour centrer sur le codon
+          proteinChain.appendChild(protein);
+        }
+
+        currentCodonIndex++;
+      }
+    }
+
+    // Arrêt de l'animation lorsque tous les codons ont été traduits
+    if (currentCodonIndex >= codons.length) {
+      // Plus besoin d'avancer le ribosome, on arrête
+      cancelAnimationFrame(animationId);
+      // Réactiver le bouton "Démarrer"
+      startButton.disabled = false;
+      pauseButton.disabled = true;
+      // Enlever le surlignage
+      codons.forEach(c => c.classList.remove('active'));
+      return;
+    }
+
+    // Prochaine frame
+    animationId = requestAnimationFrame(animate);
+  }
+
+  // Initialisation de la scène
+  function init() {
+    ribosomeX = mrna.offsetLeft - 60; // Position initiale du ribosome (un peu à gauche du premier codon)
+    ribosome.style.left = ribosomeX + 'px';
+    currentCodonIndex = 0;
+    proteinChain.innerHTML = '';
+    createCodons();
+  }
+
+  // Démarrer ou redémarrer l’animation
+  startButton.addEventListener('click', () => {
+    init();
+    startButton.disabled = true;
+    pauseButton.disabled = false;
+    pauseButton.textContent = 'Pause';
+    isPaused = false;
+    cancelAnimationFrame(animationId);
+    animate();
+  });
+
+  // Gérer le bouton Pause/Reprendre
+  pauseButton.addEventListener('click', () => {
+    // Si on n'a pas encore cliqué sur "Démarrer", on ne fait rien
+    if (startButton.disabled === false) return;
+
+    isPaused = !isPaused;
+    pauseButton.textContent = isPaused ? 'Reprendre' : 'Pause';
+  });
+
+  // Gérer le changement de vitesse
+  speedSlider.addEventListener('input', () => {
+    speed = parseFloat(speedSlider.value);
+  });
+
+  // Au chargement, on prépare la scène (codons, ribosome, etc.)
+  window.onload = init;
+</script>
+</body>
+</html>
